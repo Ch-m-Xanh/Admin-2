@@ -7,6 +7,7 @@ const cors = require("cors");
 const express = require("express");
 
 const { connectDB } = require("./db");
+const { bootstrap } = require("./bootstrap");
 const { initSocket } = require("./socket");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
@@ -86,6 +87,7 @@ const PORT = process.env.PORT || 4000;
 
 async function main() {
   await connectDB();
+  await bootstrap();
   const app = createApp();
   const server = http.createServer(app);
   initSocket(server);
