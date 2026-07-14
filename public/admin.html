@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chạm Xanh Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="toasts" id="toasts"></div>
+
+    <!-- LOGIN -->
+    <div class="login-wrap" id="loginView">
+      <div class="login-card">
+        <div class="login-logo">CX</div>
+        <h1>Chạm Xanh Admin</h1>
+        <p class="sub">Đăng nhập để quản trị hệ thống</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" required value="admin@chamxanh.vn" />
+          </div>
+          <div class="field">
+            <label for="password">Mật khẩu</label>
+            <input id="password" type="password" required placeholder="••••••••" />
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Đăng nhập</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div class="shell hidden" id="appView">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand"><span class="cx">CX</span> Chạm Xanh</div>
+        <nav class="nav">
+          <a data-page="dashboard" class="active">📊 Tổng quan</a>
+          <a data-page="articles">📝 Bài viết</a>
+          <a data-page="plants">🌿 Cây trồng</a>
+          <a data-page="users">👤 Người dùng</a>
+          <a data-page="settings">⚙️ Cài đặt</a>
+        </nav>
+        <div class="foot">
+          <button class="btn btn-light btn-block" id="logoutBtn">Đăng xuất</button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button class="menu-btn" id="menuBtn">☰</button>
+            <h2 id="pageTitle">Tổng quan</h2>
+          </div>
+          <div class="who">
+            <span id="whoName">Admin</span>
+            <div class="avatar" id="whoAvatar">A</div>
+          </div>
+        </header>
+
+        <div class="content">
+          <!-- DASHBOARD -->
+          <section class="page active" id="page-dashboard">
+            <div class="stats" id="statCards"></div>
+            <div class="card">
+              <div class="card-head"><h3>Cây được xem nhiều nhất</h3></div>
+              <div id="topPlants"></div>
+            </div>
+          </section>
+
+          <!-- ARTICLES -->
+          <section class="page" id="page-articles">
+            <div class="card">
+              <div class="card-head">
+                <h3>Bài viết Khám phá</h3>
+                <button class="btn btn-primary btn-sm" id="addArticleBtn">+ Thêm bài viết</button>
+              </div>
+              <div class="grid-cards" id="articleList"></div>
+            </div>
+          </section>
+
+          <!-- PLANTS -->
+          <section class="page" id="page-plants">
+            <div class="card">
+              <div class="card-head">
+                <h3>Cây trồng</h3>
+                <button class="btn btn-primary btn-sm" id="addPlantBtn">+ Thêm cây</button>
+              </div>
+              <div class="grid-cards" id="plantList"></div>
+            </div>
+          </section>
+
+          <!-- USERS -->
+          <section class="page" id="page-users">
+            <div class="card">
+              <div class="card-head"><h3>Người dùng</h3></div>
+              <div style="overflow-x: auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tên</th>
+                      <th>Email</th>
+                      <th>Vai trò</th>
+                      <th>Trạng thái</th>
+                      <th>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SETTINGS -->
+          <section class="page" id="page-settings">
+            <div class="card">
+              <div class="card-head"><h3>Thông tin hệ thống</h3></div>
+              <p class="muted" style="line-height: 1.8">
+                <strong>Kiến trúc:</strong> Node.js + Express + MongoDB (Mongoose) + Socket.IO<br />
+                <strong>Vai trò:</strong> Backend trung tâm phục vụ App Mobile Chạm Xanh và trang quản trị này<br />
+                <strong>Realtime:</strong> Mỗi khi bạn thêm/sửa/xoá bài viết hoặc cây, app đang mở sẽ tự cập nhật.<br />
+                <strong>API base:</strong> <code id="apiBaseInfo"></code>
+              </p>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Kết nối App Mobile</h3></div>
+              <p class="muted" style="line-height: 1.8">
+                Trong file <code>Mobile/.env</code>, đặt:<br />
+                <code>EXPO_PUBLIC_API_BASE_URL=&lt;địa-chỉ-server&gt;/api</code><br />
+                Ví dụ khi deploy: <code>https://cham-xanh-admin.onrender.com/api</code>
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL CONTAINER -->
+    <div id="modalRoot"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

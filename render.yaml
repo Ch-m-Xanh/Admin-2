@@ -1,0 +1,19 @@
+# Khai bao dich vu Render cho Web Admin 2 (BE + FE chung 1 service).
+# Sau khi push len GitHub, tren Render chon "New +" > "Blueprint" va tro toi repo nay,
+# hoac tao Web Service thu cong voi Build/Start command ben duoi.
+services:
+  - type: web
+    name: cham-xanh-admin
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false # dan connection string MongoDB Atlas trong dashboard, KHONG commit vao repo
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: ""
