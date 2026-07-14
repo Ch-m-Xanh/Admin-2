@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chạm Xanh Admin</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -17,7 +18,7 @@
     <!-- LOGIN -->
     <div class="login-wrap" id="loginView">
       <div class="login-card">
-        <div class="login-logo">CX</div>
+        <img class="login-logo" src="/logo.png" alt="Chạm Xanh" />
         <h1>Chạm Xanh Admin</h1>
         <p class="sub">Đăng nhập để quản trị hệ thống</p>
         <form id="loginForm">
@@ -37,13 +38,13 @@
     <!-- APP -->
     <div class="shell hidden" id="appView">
       <aside class="sidebar" id="sidebar">
-        <div class="brand"><span class="cx">CX</span> Chạm Xanh</div>
+        <div class="brand"><img class="cx" src="/logo.png" alt="Chạm Xanh" /> Chạm Xanh</div>
         <nav class="nav">
-          <a data-page="dashboard" class="active">📊 Tổng quan</a>
-          <a data-page="articles">📝 Bài viết</a>
-          <a data-page="plants">🌿 Cây trồng</a>
-          <a data-page="users">👤 Người dùng</a>
-          <a data-page="settings">⚙️ Cài đặt</a>
+          <a data-page="dashboard" class="active">Tổng quan</a>
+          <a data-page="articles">Bài viết</a>
+          <a data-page="plants">Cây trồng</a>
+          <a data-page="users">Người dùng</a>
+          <a data-page="settings">Cài đặt</a>
         </nav>
         <div class="foot">
           <button class="btn btn-light btn-block" id="logoutBtn">Đăng xuất</button>

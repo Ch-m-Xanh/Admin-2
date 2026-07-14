@@ -133,13 +133,11 @@
   });
 
   // ---------- dashboard ----------
-  function statCard(cls, icon, label, value) {
+  function statCard(cls, label, value) {
     return (
       '<div class="stat ' +
       cls +
-      '"><div class="icon">' +
-      icon +
-      '</div><div><div class="label">' +
+      '"><div><div class="label">' +
       label +
       '</div><div class="value">' +
       value +
@@ -150,10 +148,10 @@
     api("GET", "/admin/stats")
       .then(function (s) {
         $("#statCards").innerHTML =
-          statCard("green", "👤", "Người dùng", s.totalUsers) +
-          statCard("blue", "🌿", "Cây trồng", s.totalPlants) +
-          statCard("yellow", "📝", "Bài viết", s.totalArticles || 0) +
-          statCard("green", "📸", "Bài đăng tuần này", s.totalPostsThisWeek);
+          statCard("green", "Người dùng", s.totalUsers) +
+          statCard("blue", "Cây trồng", s.totalPlants) +
+          statCard("yellow", "Bài viết", s.totalArticles || 0) +
+          statCard("green", "Bài đăng tuần này", s.totalPostsThisWeek);
         var rows = (s.topViewedPlants || [])
           .map(function (p) {
             return (
