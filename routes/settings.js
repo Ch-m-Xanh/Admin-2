@@ -10,10 +10,16 @@ const router = Router();
 // Cac khoa cau hinh noi dung man Kham pha, kem gia tri mac dinh.
 // Chi cho phep sua dung cac khoa nay (tranh ghi bua).
 const SETTING_DEFAULTS = {
-  exploreArticleTitle: "Mẹo ủ phân hữu cơ đơn giản.",
+  // Phan tren (loi chao + cay theo danh muc)
+  exploreGreetingTitle: "Hi, hôm nay bạn muốn tìm gì?",
+  exploreGreetingSubtitle:
+    "Mình có thể giúp bạn chọn loại cây phù hợp nhất cho từng không gian.",
+  // Phan giua (Goc xanh song khoe)
   healthSectionTitle: "Góc xanh sống khỏe!",
   healthSectionSubtitle:
     "Những loại cây lành tính giúp bạn cải thiện sức khỏe mỗi ngày.",
+  // Phan cuoi (bai viet)
+  exploreArticleTitle: "Mẹo ủ phân hữu cơ đơn giản.",
 };
 
 async function getAllSettings() {

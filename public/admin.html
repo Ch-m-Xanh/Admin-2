@@ -41,8 +41,9 @@
         <div class="brand"><img class="cx" src="/logo.png" alt="Chạm Xanh" /> Chạm Xanh</div>
         <nav class="nav">
           <a data-page="dashboard" class="active">Tổng quan</a>
-          <a data-page="articles">Bài viết</a>
-          <a data-page="plants">Cây trồng</a>
+          <a data-page="plants">Phần trên · Cây trồng</a>
+          <a data-page="health">Phần giữa · Góc sống khỏe</a>
+          <a data-page="articles">Phần cuối · Bài viết</a>
           <a data-page="users">Người dùng</a>
           <a data-page="settings">Cài đặt</a>
         </nav>
@@ -73,32 +74,71 @@
             </div>
           </section>
 
-          <!-- ARTICLES -->
-          <section class="page" id="page-articles">
+          <!-- PHẦN TRÊN · CÂY TRỒNG -->
+          <section class="page" id="page-plants">
             <div class="card">
-              <div class="card-head">
-                <h3>Nội dung màn Khám phá (đồng bộ realtime)</h3>
-              </div>
-              <p style="margin:0 0 10px;color:#6b7280;font-size:13px">
-                Các tiêu đề dưới đây hiển thị trên màn Khám phá của app. Sửa xong bấm Lưu, app cập nhật ngay lập tức.
-              </p>
+              <div class="card-head"><h3>Tiêu đề phần trên (đồng bộ realtime)</h3></div>
               <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
                 <div style="flex:1;min-width:220px">
-                  <label for="setting_healthSectionTitle">Tiêu đề "Góc xanh sống khỏe"</label>
+                  <label for="setting_exploreGreetingTitle">Tiêu đề lời chào</label>
+                  <input id="setting_exploreGreetingTitle" placeholder="Hi, hôm nay bạn muốn tìm gì?" />
+                </div>
+                <button class="btn btn-primary" data-save-setting="exploreGreetingTitle">Lưu</button>
+              </div>
+              <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                  <label for="setting_exploreGreetingSubtitle">Mô tả lời chào</label>
+                  <input id="setting_exploreGreetingSubtitle" placeholder="Mình có thể giúp bạn chọn loại cây phù hợp nhất cho từng không gian." />
+                </div>
+                <button class="btn btn-primary" data-save-setting="exploreGreetingSubtitle">Lưu</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Cây trồng theo danh mục</h3>
+                <button class="btn btn-primary btn-sm" id="addPlantBtn">+ Thêm cây</button>
+              </div>
+              <p style="margin:0 0 10px;color:#6b7280;font-size:13px">Các cây hiển thị ở phần trên màn Khám phá (lọc theo Phòng ngủ / Bàn làm việc...). Không gồm cây "Góc sống khỏe".</p>
+              <div class="grid-cards" id="plantList"></div>
+            </div>
+          </section>
+
+          <!-- PHẦN GIỮA · GÓC SỐNG KHỎE -->
+          <section class="page" id="page-health">
+            <div class="card">
+              <div class="card-head"><h3>Tiêu đề "Góc xanh sống khỏe" (đồng bộ realtime)</h3></div>
+              <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                  <label for="setting_healthSectionTitle">Tiêu đề</label>
                   <input id="setting_healthSectionTitle" placeholder="Góc xanh sống khỏe!" />
                 </div>
                 <button class="btn btn-primary" data-save-setting="healthSectionTitle">Lưu</button>
               </div>
               <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
                 <div style="flex:1;min-width:220px">
-                  <label for="setting_healthSectionSubtitle">Mô tả "Góc xanh sống khỏe"</label>
+                  <label for="setting_healthSectionSubtitle">Mô tả</label>
                   <input id="setting_healthSectionSubtitle" placeholder="Những loại cây lành tính giúp bạn cải thiện sức khỏe mỗi ngày." />
                 </div>
                 <button class="btn btn-primary" data-save-setting="healthSectionSubtitle">Lưu</button>
               </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h3>Cây "Góc xanh sống khỏe"</h3>
+                <button class="btn btn-primary btn-sm" id="addHealthBtn">+ Thêm cây sống khỏe</button>
+              </div>
+              <p style="margin:0 0 10px;color:#6b7280;font-size:13px">Các cây thuộc danh mục "Rau củ / Chữa bệnh", hiển thị ở mục giữa màn Khám phá.</p>
+              <div class="grid-cards" id="healthList"></div>
+            </div>
+          </section>
+
+          <!-- PHẦN CUỐI · BÀI VIẾT -->
+          <section class="page" id="page-articles">
+            <div class="card">
+              <div class="card-head"><h3>Tiêu đề mục bài viết (đồng bộ realtime)</h3></div>
               <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
                 <div style="flex:1;min-width:220px">
-                  <label for="setting_exploreArticleTitle">Tiêu đề mục bài viết (hôm nay)</label>
+                  <label for="setting_exploreArticleTitle">Tiêu đề hôm nay</label>
                   <input id="setting_exploreArticleTitle" placeholder="Mẹo ủ phân hữu cơ đơn giản." />
                 </div>
                 <button class="btn btn-primary" data-save-setting="exploreArticleTitle">Lưu</button>
@@ -110,17 +150,6 @@
                 <button class="btn btn-primary btn-sm" id="addArticleBtn">+ Thêm bài viết</button>
               </div>
               <div class="grid-cards" id="articleList"></div>
-            </div>
-          </section>
-
-          <!-- PLANTS -->
-          <section class="page" id="page-plants">
-            <div class="card">
-              <div class="card-head">
-                <h3>Cây trồng</h3>
-                <button class="btn btn-primary btn-sm" id="addPlantBtn">+ Thêm cây</button>
-              </div>
-              <div class="grid-cards" id="plantList"></div>
             </div>
           </section>
 

@@ -104,8 +104,9 @@
   // ---------- navigation ----------
   var TITLES = {
     dashboard: "Tổng quan",
-    articles: "Bài viết",
-    plants: "Cây trồng",
+    plants: "Phần trên · Cây trồng",
+    health: "Phần giữa · Góc sống khỏe",
+    articles: "Phần cuối · Bài viết",
     users: "Người dùng",
     settings: "Cài đặt",
   };
@@ -121,6 +122,7 @@
     if (page === "dashboard") loadDashboard();
     if (page === "articles") loadArticles();
     if (page === "plants") loadPlants();
+    if (page === "health") loadHealth();
     if (page === "users") loadUsers();
   }
   document.querySelectorAll(".nav a").forEach(function (a) {
@@ -177,7 +179,13 @@
   }
 
   // ---------- articles + settings ----------
-  var SETTING_KEYS = ["healthSectionTitle", "healthSectionSubtitle", "exploreArticleTitle"];
+  var SETTING_KEYS = [
+    "exploreGreetingTitle",
+    "exploreGreetingSubtitle",
+    "healthSectionTitle",
+    "healthSectionSubtitle",
+    "exploreArticleTitle",
+  ];
 
   function loadSettings() {
     api("GET", "/settings")
@@ -322,51 +330,80 @@
       CATEGORIES = c || [];
     });
   }
+  var HEALTH_CAT = "rau-cu-chua-benh";
+
+  function plantCardHtml(p) {
+    var img = p.imageUrl
+      ? '<img class="cover" src="' + esc(p.imageUrl) + '" onerror="this.style.display=\'none\'" />'
+      : '<div class="cover"></div>';
+    return (
+      '<div class="item-card">' +
+      img +
+      '<div class="body"><h4>' +
+      esc(p.name) +
+      '</h4><div><span class="badge blue">' +
+      esc(p.category) +
+      "</span></div><p>" +
+      esc(p.description || "") +
+      '</p><div class="actions">' +
+      '<button class="btn btn-light btn-sm" data-edit-plant="' +
+      p.id +
+      '">Sửa</button>' +
+      '<button class="btn btn-danger btn-sm" data-del-plant="' +
+      p.id +
+      '">Xoá</button>' +
+      "</div></div></div>"
+    );
+  }
+
+  function cachePlants(list) {
+    window.__plants = window.__plants || {};
+    list.forEach(function (p) {
+      window.__plants[p.id] = p;
+    });
+  }
+
+  // Phan tren: cay theo danh muc (khong gom "Goc song khoe").
   function loadPlants() {
+    loadSettings();
     api("GET", "/plants")
       .then(function (list) {
-        if (!list.length) {
-          $("#plantList").innerHTML = '<div class="empty">Chưa có cây nào. Bấm "+ Thêm cây".</div>';
-          return;
-        }
-        $("#plantList").innerHTML = list
-          .map(function (p) {
-            var img = p.imageUrl
-              ? '<img class="cover" src="' + esc(p.imageUrl) + '" onerror="this.style.display=\'none\'" />'
-              : '<div class="cover"></div>';
-            return (
-              '<div class="item-card">' +
-              img +
-              '<div class="body"><h4>' +
-              esc(p.name) +
-              '</h4><div><span class="badge blue">' +
-              esc(p.category) +
-              "</span></div><p>" +
-              esc(p.description || "") +
-              '</p><div class="actions">' +
-              '<button class="btn btn-light btn-sm" data-edit-plant="' +
-              p.id +
-              '">Sửa</button>' +
-              '<button class="btn btn-danger btn-sm" data-del-plant="' +
-              p.id +
-              '">Xoá</button>' +
-              "</div></div></div>"
-            );
-          })
-          .join("");
-        window.__plants = {};
-        list.forEach(function (p) {
-          window.__plants[p.id] = p;
+        cachePlants(list);
+        var top = list.filter(function (p) {
+          return p.category !== HEALTH_CAT;
         });
+        $("#plantList").innerHTML = top.length
+          ? top.map(plantCardHtml).join("")
+          : '<div class="empty">Chưa có cây nào. Bấm "+ Thêm cây".</div>';
       })
       .catch(function (err) {
         toast(err.message, false);
       });
   }
 
-  function plantModal(plant) {
+  // Phan giua: cay "Goc xanh song khoe" (danh muc rau-cu-chua-benh).
+  function loadHealth() {
+    loadSettings();
+    api("GET", "/plants?category=" + HEALTH_CAT)
+      .then(function (list) {
+        cachePlants(list);
+        $("#healthList").innerHTML = list.length
+          ? list.map(plantCardHtml).join("")
+          : '<div class="empty">Chưa có cây sống khỏe nào. Bấm "+ Thêm cây sống khỏe".</div>';
+      })
+      .catch(function (err) {
+        toast(err.message, false);
+      });
+  }
+
+  function reloadActivePlantList() {
+    if ($("#page-health").classList.contains("active")) loadHealth();
+    else loadPlants();
+  }
+
+  function plantModal(plant, presetCategory) {
     var p = plant || {
-      name: "", category: "", description: "", imageUrl: "", careLevel: "easy", isMedicinal: false,
+      name: "", category: presetCategory || "", description: "", imageUrl: "", careLevel: "easy", isMedicinal: !!presetCategory,
       light: "", water: "", harvestTime: "", soilType: "", seedPrice: "",
       healthBenefits: "", harvestTimeline: "", didYouKnow: "", forYou: "", careInstructions: [],
     };
@@ -464,7 +501,7 @@
         return req
           .then(function () {
             toast(isEdit ? "Đã cập nhật cây" : "Đã thêm cây");
-            loadPlants();
+            reloadActivePlantList();
             return true;
           })
           .catch(function (err) {
@@ -478,6 +515,12 @@
   $("#addPlantBtn").addEventListener("click", function () {
     plantModal(null);
   });
+  var addHealthBtn = $("#addHealthBtn");
+  if (addHealthBtn) {
+    addHealthBtn.addEventListener("click", function () {
+      plantModal(null, HEALTH_CAT);
+    });
+  }
 
   // ---------- users ----------
   function loadUsers() {
@@ -530,7 +573,7 @@
     if (t.dataset.editArticle) articleModal(window.__articles[t.dataset.editArticle]);
     if (t.dataset.delArticle) confirmDel("Xoá bài viết này?", "/articles/" + t.dataset.delArticle, loadArticles);
     if (t.dataset.editPlant) plantModal(window.__plants[t.dataset.editPlant]);
-    if (t.dataset.delPlant) confirmDel("Xoá cây này?", "/plants/" + t.dataset.delPlant, loadPlants);
+    if (t.dataset.delPlant) confirmDel("Xoá cây này?", "/plants/" + t.dataset.delPlant, reloadActivePlantList);
     if (t.dataset.delUser) confirmDel("Xoá người dùng này?", "/admin/users/" + t.dataset.delUser, loadUsers);
     if (t.dataset.lockUser) {
       var locked = t.dataset.locked === "1";
@@ -606,10 +649,17 @@
     socket.on("settings:updated", function (payload) {
       if (payload && SETTING_KEYS.indexOf(payload.key) >= 0) {
         var input = $("#setting_" + payload.key);
-        if (input && $("#page-articles").classList.contains("active")) {
-          input.value = payload.value || "";
-        }
+        if (input) input.value = payload.value || "";
       }
+    });
+    socket.on("plant:created", function () {
+      if ($("#page-health").classList.contains("active")) loadHealth();
+    });
+    socket.on("plant:updated", function () {
+      if ($("#page-health").classList.contains("active")) loadHealth();
+    });
+    socket.on("plant:deleted", function () {
+      if ($("#page-health").classList.contains("active")) loadHealth();
     });
   }
 
