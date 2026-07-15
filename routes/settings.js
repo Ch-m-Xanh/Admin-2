@@ -7,45 +7,69 @@ const { emitPublic } = require("../socket");
 
 const router = Router();
 
-// Key duy nhat cho tieu de muc bai viet ("Meo u phan huu co...") tren app.
-const EXPLORE_TITLE_KEY = "exploreArticleTitle";
-const EXPLORE_TITLE_DEFAULT = "Mẹo ủ phân hữu cơ đơn giản.";
+// Cac khoa cau hinh noi dung man Kham pha, kem gia tri mac dinh.
+// Chi cho phep sua dung cac khoa nay (tranh ghi bua).
+const SETTING_DEFAULTS = {
+  exploreArticleTitle: "Mẹo ủ phân hữu cơ đơn giản.",
+  healthSectionTitle: "Góc xanh sống khỏe!",
+  healthSectionSubtitle:
+    "Những loại cây lành tính giúp bạn cải thiện sức khỏe mỗi ngày.",
+};
 
-async function getExploreTitle() {
-  const doc = await Setting.findOne({ key: EXPLORE_TITLE_KEY });
-  return doc && typeof doc.value === "string" && doc.value.trim()
-    ? doc.value
-    : EXPLORE_TITLE_DEFAULT;
+async function getAllSettings() {
+  const docs = await Setting.find({ key: { $in: Object.keys(SETTING_DEFAULTS) } });
+  const values = { ...SETTING_DEFAULTS };
+  docs.forEach((d) => {
+    if (typeof d.value === "string" && d.value.trim()) values[d.key] = d.value;
+  });
+  return values;
 }
 
-// GET /api/settings/explore-title  (public) -> { title }
-// App doc tieu de muc bai viet o man Kham pha.
+// GET /api/settings (public) -> toan bo cau hinh noi dung man Kham pha.
 router.get(
-  "/explore-title",
+  "/",
   asyncHandler(async (_req, res) => {
-    const title = await getExploreTitle();
-    res.json({ title });
+    res.json(await getAllSettings());
   })
 );
 
-// PUT /api/settings/explore-title  (admin) -> cap nhat "tieu de hom nay".
-router.put(
+// GET /api/settings/explore-title (public, giu tuong thich cu).
+router.get(
   "/explore-title",
+  asyncHandler(async (_req, res) => {
+    const all = await getAllSettings();
+    res.json({ title: all.exploreArticleTitle });
+  })
+);
+
+// PUT /api/settings/:key (admin) -> cap nhat 1 khoa, phat realtime.
+router.put(
+  "/:key",
   requireAuth,
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const raw = (req.body && req.body.title) != null ? String(req.body.title).trim() : "";
-    if (!raw) {
-      throw AppError.validation("Tiêu đề không được để trống");
+    // Cho phep /explore-title tro toi exploreArticleTitle.
+    const alias = { "explore-title": "exploreArticleTitle" };
+    const key = alias[req.params.key] || req.params.key;
+
+    if (!Object.prototype.hasOwnProperty.call(SETTING_DEFAULTS, key)) {
+      throw AppError.validation("Khoa cau hinh khong hop le");
     }
+    const raw =
+      req.body && (req.body.value != null || req.body.title != null)
+        ? String(req.body.value != null ? req.body.value : req.body.title).trim()
+        : "";
+    if (!raw) {
+      throw AppError.validation("Nội dung không được để trống");
+    }
+
     await Setting.findOneAndUpdate(
-      { key: EXPLORE_TITLE_KEY },
+      { key },
       { value: raw },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-    // Realtime: app dang mo se cap nhat tieu de ngay.
-    emitPublic("settings:updated", { key: EXPLORE_TITLE_KEY, value: raw });
-    res.json({ title: raw });
+    emitPublic("settings:updated", { key, value: raw });
+    res.json({ key, value: raw });
   })
 );
 

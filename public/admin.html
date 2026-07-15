@@ -77,17 +77,31 @@
           <section class="page" id="page-articles">
             <div class="card">
               <div class="card-head">
-                <h3>Tiêu đề mục bài viết trên app</h3>
+                <h3>Nội dung màn Khám phá (đồng bộ realtime)</h3>
               </div>
               <p style="margin:0 0 10px;color:#6b7280;font-size:13px">
-                Dòng tiêu đề "hôm nay" hiển thị phía trên danh sách bài viết ở màn Khám phá của app. Sửa xong bấm Lưu, app sẽ cập nhật ngay.
+                Các tiêu đề dưới đây hiển thị trên màn Khám phá của app. Sửa xong bấm Lưu, app cập nhật ngay lập tức.
               </p>
               <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
                 <div style="flex:1;min-width:220px">
-                  <label for="exploreTitleInput">Tiêu đề hôm nay</label>
-                  <input id="exploreTitleInput" placeholder="Ví dụ: Mẹo ủ phân hữu cơ đơn giản." />
+                  <label for="setting_healthSectionTitle">Tiêu đề "Góc xanh sống khỏe"</label>
+                  <input id="setting_healthSectionTitle" placeholder="Góc xanh sống khỏe!" />
                 </div>
-                <button class="btn btn-primary" id="saveExploreTitleBtn">Lưu tiêu đề</button>
+                <button class="btn btn-primary" data-save-setting="healthSectionTitle">Lưu</button>
+              </div>
+              <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                  <label for="setting_healthSectionSubtitle">Mô tả "Góc xanh sống khỏe"</label>
+                  <input id="setting_healthSectionSubtitle" placeholder="Những loại cây lành tính giúp bạn cải thiện sức khỏe mỗi ngày." />
+                </div>
+                <button class="btn btn-primary" data-save-setting="healthSectionSubtitle">Lưu</button>
+              </div>
+              <div class="field" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                  <label for="setting_exploreArticleTitle">Tiêu đề mục bài viết (hôm nay)</label>
+                  <input id="setting_exploreArticleTitle" placeholder="Mẹo ủ phân hữu cơ đơn giản." />
+                </div>
+                <button class="btn btn-primary" data-save-setting="exploreArticleTitle">Lưu</button>
               </div>
             </div>
             <div class="card">

@@ -32,6 +32,41 @@ function parsePlantBody(body, partial) {
           .map((t) => t.trim())
           .filter(Boolean);
   }
+
+  // --- Cac truong chi tiet ---
+  if (body.harvestTime !== undefined) out.harvestTime = String(body.harvestTime || "");
+  if (body.soilType !== undefined) out.soilType = String(body.soilType || "");
+  if (body.healthBenefits !== undefined) out.healthBenefits = String(body.healthBenefits || "");
+  if (body.harvestTimeline !== undefined) out.harvestTimeline = String(body.harvestTimeline || "");
+  if (body.didYouKnow !== undefined) out.didYouKnow = String(body.didYouKnow || "");
+  if (body.forYou !== undefined) out.forYou = String(body.forYou || "");
+  if (body.seedPrice !== undefined) {
+    const n = Number(String(body.seedPrice).replace(/[^\d.]/g, ""));
+    out.seedPrice = Number.isFinite(n) && n > 0 ? n : null;
+  }
+  // careInstructions: chap nhan mang [{title, body}] hoac chuoi nhieu dong
+  // "Tiêu đề | mô tả" (moi dong 1 muc).
+  if (body.careInstructions !== undefined) {
+    if (Array.isArray(body.careInstructions)) {
+      out.careInstructions = body.careInstructions
+        .map((it) => ({
+          title: String((it && it.title) || "").trim(),
+          body: String((it && it.body) || "").trim(),
+        }))
+        .filter((it) => it.title || it.body);
+    } else {
+      out.careInstructions = String(body.careInstructions)
+        .split("\n")
+        .map((line) => {
+          const idx = line.indexOf("|");
+          const title = idx >= 0 ? line.slice(0, idx) : line;
+          const bodyText = idx >= 0 ? line.slice(idx + 1) : "";
+          return { title: title.trim(), body: bodyText.trim() };
+        })
+        .filter((it) => it.title || it.body);
+    }
+  }
+
   if (!partial) {
     if (!out.name) throw AppError.validation("Ten cay khong duoc de trong");
     if (!out.category) throw AppError.validation("Danh muc khong duoc de trong");

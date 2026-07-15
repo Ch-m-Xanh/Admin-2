@@ -176,42 +176,47 @@
       });
   }
 
-  // ---------- articles ----------
-  function loadExploreTitle() {
-    api("GET", "/settings/explore-title")
+  // ---------- articles + settings ----------
+  var SETTING_KEYS = ["healthSectionTitle", "healthSectionSubtitle", "exploreArticleTitle"];
+
+  function loadSettings() {
+    api("GET", "/settings")
       .then(function (data) {
-        var input = $("#exploreTitleInput");
-        if (input) input.value = (data && data.title) || "";
+        SETTING_KEYS.forEach(function (key) {
+          var input = $("#setting_" + key);
+          if (input) input.value = (data && data[key]) || "";
+        });
       })
       .catch(function () {
         // im lang - khong chan trang bai viet neu loi
       });
   }
 
-  var saveTitleBtn = $("#saveExploreTitleBtn");
-  if (saveTitleBtn) {
-    saveTitleBtn.addEventListener("click", function () {
-      var title = $("#exploreTitleInput").value.trim();
-      if (!title) {
-        toast("Tiêu đề không được để trống", false);
-        return;
-      }
-      saveTitleBtn.disabled = true;
-      api("PUT", "/settings/explore-title", { title: title })
-        .then(function () {
-          toast("Đã cập nhật tiêu đề hôm nay");
-        })
-        .catch(function (err) {
-          toast(err.message, false);
-        })
-        .finally(function () {
-          saveTitleBtn.disabled = false;
-        });
-    });
-  }
+  // Bam nut "Luu" canh 1 o setting.
+  document.addEventListener("click", function (e) {
+    var key = e.target && e.target.dataset && e.target.dataset.saveSetting;
+    if (!key) return;
+    var input = $("#setting_" + key);
+    var value = input ? input.value.trim() : "";
+    if (!value) {
+      toast("Nội dung không được để trống", false);
+      return;
+    }
+    e.target.disabled = true;
+    api("PUT", "/settings/" + key, { value: value })
+      .then(function () {
+        toast("Đã cập nhật, app sẽ đồng bộ ngay");
+      })
+      .catch(function (err) {
+        toast(err.message, false);
+      })
+      .finally(function () {
+        e.target.disabled = false;
+      });
+  });
 
   function loadArticles() {
-    loadExploreTitle();
+    loadSettings();
     api("GET", "/articles?all=true")
       .then(function (list) {
         if (!list.length) {
@@ -360,11 +365,21 @@
   }
 
   function plantModal(plant) {
-    var p = plant || { name: "", category: "", description: "", imageUrl: "", careLevel: "easy", isMedicinal: false };
+    var p = plant || {
+      name: "", category: "", description: "", imageUrl: "", careLevel: "easy", isMedicinal: false,
+      light: "", water: "", harvestTime: "", soilType: "", seedPrice: "",
+      healthBenefits: "", harvestTimeline: "", didYouKnow: "", forYou: "", careInstructions: [],
+    };
     var isEdit = !!plant;
     var catOpts = CATEGORIES.map(function (c) {
       return '<option value="' + esc(c.value) + '"' + (p.category === c.value ? " selected" : "") + ">" + esc(c.label) + "</option>";
     }).join("");
+    // careInstructions -> text "Tiêu đề | mô tả" moi dong 1 muc.
+    var careText = (p.careInstructions || [])
+      .map(function (it) {
+        return (it.title || "") + " | " + (it.body || "");
+      })
+      .join("\n");
     openModal(
       isEdit ? "Sửa cây" : "Thêm cây mới",
       '<div class="field"><label>Tên cây</label><input id="p_name" value="' +
@@ -376,16 +391,49 @@
         '<div class="field"><label>Ảnh (URL)</label><input id="p_img" placeholder="https://..." value="' +
         esc(p.imageUrl || "") +
         '" /></div>' +
-        '<div class="field"><label>Mô tả</label><textarea id="p_desc">' +
+        '<div class="field"><label>Mô tả ngắn (dưới tên cây)</label><textarea id="p_desc">' +
         esc(p.description || "") +
         "</textarea></div>" +
         '<div class="field"><label>Độ chăm sóc</label><select id="p_care">' +
         ["easy", "medium", "hard"]
           .map(function (v) {
-            return '<option value="' + v + '"' + (p.careLevel === v ? " selected" : "") + ">" + v + "</option>";
+            var lbl = { easy: "Dễ chăm sóc", medium: "Chăm sóc vừa", hard: "Khó chăm sóc" }[v];
+            return '<option value="' + v + '"' + (p.careLevel === v ? " selected" : "") + ">" + lbl + "</option>";
           })
           .join("") +
         "</select></div>" +
+        '<h4 style="margin:14px 0 4px">4 ô thông tin nhanh</h4>' +
+        '<div class="field"><label>Thu hoạch</label><input id="p_harvest" placeholder="80-100 ngày" value="' +
+        esc(p.harvestTime || "") +
+        '" /></div>' +
+        '<div class="field"><label>Ánh sáng</label><input id="p_light" placeholder="Nắng toàn phần" value="' +
+        esc(p.light || "") +
+        '" /></div>' +
+        '<div class="field"><label>Tưới nước</label><input id="p_water" placeholder="Đều đặn" value="' +
+        esc(p.water || "") +
+        '" /></div>' +
+        '<div class="field"><label>Loại đất</label><input id="p_soil" placeholder="Giàu hữu cơ" value="' +
+        esc(p.soilType || "") +
+        '" /></div>' +
+        '<h4 style="margin:14px 0 4px">Nội dung chi tiết</h4>' +
+        '<div class="field"><label>Cách chăm sóc (mỗi dòng: <b>Tiêu đề | mô tả</b>)</label><textarea id="p_care_ins" rows="4" placeholder="Ánh sáng mặt trời | Cần 6-8 giờ nắng trực tiếp mỗi ngày.">' +
+        esc(careText) +
+        "</textarea></div>" +
+        '<div class="field"><label>Lợi ích sức khỏe</label><textarea id="p_health">' +
+        esc(p.healthBenefits || "") +
+        "</textarea></div>" +
+        '<div class="field"><label>Thời gian thu hoạch</label><textarea id="p_timeline">' +
+        esc(p.harvestTimeline || "") +
+        "</textarea></div>" +
+        '<div class="field"><label>Bạn có biết?</label><textarea id="p_know">' +
+        esc(p.didYouKnow || "") +
+        "</textarea></div>" +
+        '<div class="field"><label>Dành cho bạn</label><textarea id="p_foryou">' +
+        esc(p.forYou || "") +
+        "</textarea></div>" +
+        '<div class="field"><label>Giá bán giống (VND)</label><input id="p_price" type="number" placeholder="45000" value="' +
+        esc(p.seedPrice != null ? p.seedPrice : "") +
+        '" /></div>' +
         '<div class="field"><label><input type="checkbox" id="p_med" style="width:auto;margin-right:6px" ' +
         (p.isMedicinal ? "checked" : "") +
         "/> Cây dược liệu / chữa bệnh</label></div>",
@@ -397,6 +445,16 @@
           description: $("#p_desc").value.trim(),
           careLevel: $("#p_care").value,
           isMedicinal: $("#p_med").checked,
+          light: $("#p_light").value.trim(),
+          water: $("#p_water").value.trim(),
+          harvestTime: $("#p_harvest").value.trim(),
+          soilType: $("#p_soil").value.trim(),
+          careInstructions: $("#p_care_ins").value,
+          healthBenefits: $("#p_health").value.trim(),
+          harvestTimeline: $("#p_timeline").value.trim(),
+          didYouKnow: $("#p_know").value.trim(),
+          forYou: $("#p_foryou").value.trim(),
+          seedPrice: $("#p_price").value.trim(),
         };
         if (!body.name || !body.category) {
           toast("Tên và danh mục không được để trống", false);
@@ -546,8 +604,8 @@
     socket.on("plant:updated", refreshPlants);
     socket.on("plant:deleted", refreshPlants);
     socket.on("settings:updated", function (payload) {
-      if (payload && payload.key === "exploreArticleTitle") {
-        var input = $("#exploreTitleInput");
+      if (payload && SETTING_KEYS.indexOf(payload.key) >= 0) {
+        var input = $("#setting_" + payload.key);
         if (input && $("#page-articles").classList.contains("active")) {
           input.value = payload.value || "";
         }
