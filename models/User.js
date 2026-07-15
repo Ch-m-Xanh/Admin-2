@@ -4,7 +4,10 @@ const userSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    passwordHash: { type: String, required: true },
+    // Optional: tai khoan dang nhap bang Google se khong co mat khau.
+    passwordHash: { type: String },
+    // Google subject id (`sub`) — dinh danh on dinh cho tai khoan Google.
+    googleId: { type: String, index: true, sparse: true },
     avatarUrl: { type: String, default: "" },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     gardenName: { type: String, default: "" },
