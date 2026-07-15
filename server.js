@@ -21,6 +21,7 @@ const userRoutes = require("./routes/users");
 const chatRoutes = require("./routes/chat");
 const uploadRoutes = require("./routes/uploads");
 const adminRoutes = require("./routes/admin");
+const settingsRoutes = require("./routes/settings");
 
 function createApp() {
   const app = express();
@@ -63,6 +64,7 @@ function createApp() {
   app.use("/api/chat", chatRoutes);
   app.use("/api/uploads", uploadRoutes);
   app.use("/api/admin", adminRoutes);
+  app.use("/api/settings", settingsRoutes);
 
   // Trang admin: /admin -> public/admin.html
   app.get("/admin", (_req, res) => res.sendFile(path.join(publicDir, "admin.html")));

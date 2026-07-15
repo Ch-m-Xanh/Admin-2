@@ -177,7 +177,41 @@
   }
 
   // ---------- articles ----------
+  function loadExploreTitle() {
+    api("GET", "/settings/explore-title")
+      .then(function (data) {
+        var input = $("#exploreTitleInput");
+        if (input) input.value = (data && data.title) || "";
+      })
+      .catch(function () {
+        // im lang - khong chan trang bai viet neu loi
+      });
+  }
+
+  var saveTitleBtn = $("#saveExploreTitleBtn");
+  if (saveTitleBtn) {
+    saveTitleBtn.addEventListener("click", function () {
+      var title = $("#exploreTitleInput").value.trim();
+      if (!title) {
+        toast("Tiêu đề không được để trống", false);
+        return;
+      }
+      saveTitleBtn.disabled = true;
+      api("PUT", "/settings/explore-title", { title: title })
+        .then(function () {
+          toast("Đã cập nhật tiêu đề hôm nay");
+        })
+        .catch(function (err) {
+          toast(err.message, false);
+        })
+        .finally(function () {
+          saveTitleBtn.disabled = false;
+        });
+    });
+  }
+
   function loadArticles() {
+    loadExploreTitle();
     api("GET", "/articles?all=true")
       .then(function (list) {
         if (!list.length) {
@@ -511,6 +545,14 @@
     socket.on("plant:created", refreshPlants);
     socket.on("plant:updated", refreshPlants);
     socket.on("plant:deleted", refreshPlants);
+    socket.on("settings:updated", function (payload) {
+      if (payload && payload.key === "exploreArticleTitle") {
+        var input = $("#exploreTitleInput");
+        if (input && $("#page-articles").classList.contains("active")) {
+          input.value = payload.value || "";
+        }
+      }
+    });
   }
 
   // ---------- boot ----------

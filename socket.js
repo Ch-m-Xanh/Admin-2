@@ -10,6 +10,7 @@ const { Server } = require("socket.io");
 //   article:deleted                     -> { _id }
 //   user-plant:created / :updated       -> full UserPlant
 //   user-plant:deleted                  -> { _id }
+//   settings:updated                    -> { key, value }
 let io = null;
 
 function initSocket(httpServer) {
